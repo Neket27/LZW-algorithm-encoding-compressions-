@@ -10,9 +10,11 @@
 
 # Блок-схемы
 Сжатие
+
 ![блок-схема-compress](https://user-images.githubusercontent.com/21179689/122956247-44586480-d39a-11eb-86cb-6e317ea43409.png)
 
 Восстановление
+
 ![блок-схема-decompress](https://user-images.githubusercontent.com/21179689/122956256-47ebeb80-d39a-11eb-94a0-058e64679849.png)
 
 # Файлы-примеры
