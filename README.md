@@ -20,5 +20,5 @@
 # Файлы-примеры
 ![Screenshot_5](https://user-images.githubusercontent.com/21179689/122956268-4ae6dc00-d39a-11eb-89a3-87543ecfbcac.png)
 
-# Эффективность алгоритма от размера файла
+# Эффективность алгоритма от размера текстового файла
 ![Screenshot_7](https://user-images.githubusercontent.com/21179689/122956280-4de1cc80-d39a-11eb-9350-b5770b413ff0.png)
