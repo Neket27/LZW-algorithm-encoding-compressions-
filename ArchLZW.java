@@ -13,15 +13,19 @@ public class ArchLZW {
    public static void main(String[] args) throws IOException {
       Scanner sc = new Scanner(System.in);
       System.out.print("Название исходного файла: ");
-      String pathIn = sc.nextLine();
+//      String pathIn = sc.nextLine();
+      String pathIn ="/home/neket/Рабочий стол/Variant8.txt";
+//      String pathIn="/home/neket/Рабочий стол/Variant8out.txt";
       System.out.print("Название выходного файла: ");
-      String pathOut = sc.nextLine();
+//      String pathOut = sc.nextLine();
+      String pathOut ="/home/neket/Рабочий стол/Variant8out.txt";
+//      String pathOut ="/home/neket/Рабочий стол/Variant8Q";
       System.out.print("Режим работы [1 - Архивация, 2 - Дезархивация]\n> ");
       int mode = sc.nextInt();
       File fileIn = new File(pathIn);
       File fileOut = new File(pathOut);
       if(!fileIn.exists()) {
-         System.out.println("Файл \'" + pathIn + "\' не существует.");
+         System.out.println("Файл '" + pathIn + "' не существует.");
       } else {
          System.out.println("{-Размер блока DINAMIC-}\n");
          long time;
@@ -30,7 +34,7 @@ public class ArchLZW {
          if(mode == 1) {
             time = System.currentTimeMillis();
             in = new RandomAccessFile(fileIn.getAbsolutePath(), "r");
-            out = new RandomAccessFile(fileOut.getAbsolutePath() + ".LZW", "rw");
+            out = new RandomAccessFile(fileOut.getAbsolutePath() + ".txt", "rw");
             compressFile(in, out);
             in.close();
             out.close();
@@ -52,7 +56,7 @@ public class ArchLZW {
       System.out.println("[-Архивация началась-] + [-Размер исходного файла " + in.length() + " байт-]");
       long time = System.currentTimeMillis();
       StringBuilder sb = new StringBuilder();
-      String lineBuffer = "";
+      String lineBuffer;
 
       while((lineBuffer = in.readLine()) != null) {
          sb.append(lineBuffer).append("\n");
@@ -61,13 +65,11 @@ public class ArchLZW {
       sb.delete(sb.length() - 1, sb.length());
       System.out.println("> Считано " + sb.length() + " символов и занесено в буфер. (t: " + (System.currentTimeMillis() - time) + " мс)");
       time = System.currentTimeMillis();
-      List compressed = compress(sb.toString());
-      Iterator var8 = compressed.iterator();
+      List<Integer> compressed = compress(sb.toString());
 
-      while(var8.hasNext()) {
-         Integer com = (Integer)var8.next();
-         out.writeInt(com.intValue());
-      }
+       for (Integer com : compressed) {
+           out.writeInt(com);
+       }
 
       System.out.println("> Сброшено в файл " + compressed.size() * 4 + " байт. (t: " + (System.currentTimeMillis() - time) + " мс)");
    }
@@ -75,11 +77,11 @@ public class ArchLZW {
    public static void decompressFile(RandomAccessFile in, RandomAccessFile out) throws IOException {
       System.out.println("[-Дезархивация началась-] + [-Размер исходного файла " + in.length() + " байт-]");
       long time = System.currentTimeMillis();
-      ArrayList buffer = new ArrayList();
+      ArrayList<Integer> buffer = new ArrayList<>();
 
       while(in.getFilePointer() <= in.length()) {
          try {
-            buffer.add(Integer.valueOf(in.readInt()));
+            buffer.add(in.readInt());
          } catch (EOFException var6) {
             break;
          }
@@ -92,16 +94,16 @@ public class ArchLZW {
       System.out.println("> Сброшено в файл " + decompressed.length() + " символов. (t: " + (System.currentTimeMillis() - time) + " мс)");
    }
 
-   private static List compress(String uncompressed) {
+   private static List<Integer> compress(String uncompressed) {
       int dictSize = 256;
-      HashMap dictionary = new HashMap();
+      HashMap<String,Integer> dictionary = new HashMap<>();
 
       for(int buffer = 0; buffer < 256; ++buffer) {
-         dictionary.put(String.valueOf((char)buffer), Integer.valueOf(buffer));
+         dictionary.put(String.valueOf((char)buffer), buffer);
       }
 
       String var10 = "";
-      ArrayList result = new ArrayList();
+      ArrayList<Integer> result = new ArrayList<>();
       char[] var8;
       int var7 = (var8 = uncompressed.toCharArray()).length;
 
@@ -110,8 +112,8 @@ public class ArchLZW {
          StringBuilder word = new StringBuilder();
          word.append(var10).append(symbol);
          if(!dictionary.containsKey(word.toString())) {
-            result.add((Integer)dictionary.get(var10));
-            dictionary.put(word.toString(), Integer.valueOf(dictSize++));
+            result.add(dictionary.get(var10));
+            dictionary.put(word.toString(), dictSize++);
             var10 = String.valueOf(symbol);
          } else {
             var10 = word.toString();
@@ -119,27 +121,27 @@ public class ArchLZW {
       }
 
       if(!var10.equals("")) {
-         result.add((Integer)dictionary.get(var10));
+         result.add(dictionary.get(var10));
       }
 
       return result;
    }
 
-   private static String decompress(List compressed) {
-      ArrayList dict = new ArrayList();
+   private static String decompress(List<Integer> compressed) {
+      ArrayList<String> dict = new ArrayList<>();
 
       for(int word = 0; word < 256; ++word) {
          dict.add(String.valueOf((char)word));
       }
 
-      String var7 = String.valueOf((char)((Integer)compressed.remove(0)).intValue());
+      String var7 = String.valueOf((char)(compressed.remove(0)).intValue());
       StringBuilder result = new StringBuilder(var7);
 
       String entry;
       for(Iterator var5 = compressed.iterator(); var5.hasNext(); var7 = entry) {
          int code = ((Integer)var5.next()).intValue();
          if(code < dict.size()) {
-            entry = (String)dict.get(code);
+            entry = dict.get(code);
          } else {
             if(code != dict.size()) {
                throw new IllegalArgumentException("Ошибка при считывание символов, позиция: " + code);
